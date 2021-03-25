@@ -60,6 +60,7 @@ class Reviews(db.Model):
     overall_score = db.Column(db.Integer, index=True)
     smother = db.Column(db.Boolean)
     smother_score = db.Column(db.Boolean)
+    overview = db.Column(db.String(1000))
     published = db.Column(db.Boolean)
 
 class Access(db.Model):

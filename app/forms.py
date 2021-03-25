@@ -63,6 +63,7 @@ class NewForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State', validators=[DataRequired()])
     zip_code = StringField('ZIP Code', validators=[DataRequired()])
+    overview = TextAreaField('Overview')
     tortilla_desc = TextAreaField('Tortilla', validators=[DataRequired()])
     tortilla_score = FloatField('Tortilla Score', validators=[DataRequired()])
     potato_desc = TextAreaField('Potato', validators=[DataRequired()])
