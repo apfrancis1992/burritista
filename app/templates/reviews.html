@@ -4,6 +4,6 @@
 {% block app_content %}
     <h1>Breakfast Burritos We've Reviewed</h1>
     {% for restaurant in restaurants %}
-        <h3>{{ restaurant.restaurant_name }} - {{ restaurant.overall_score }}</h3>
+        <h3><a href={{ url_for('restaurant', restaurant_name= restaurant.restaurant_name) }}>{{ restaurant.restaurant_name }}</a> - {{ restaurant.overall_score }}</h3>
     {% endfor %}
 {% endblock %}

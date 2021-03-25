@@ -103,14 +103,8 @@ def reviews():
 
 @app.route('/reviews/<restaurant_name>', methods=['GET', 'POST'])
 def restaurant(restaurant_name):
-    station_metar = Metar.query.filter_by(station_id=station_id).order_by(Metar.id.desc()).limit(1).first()
-    taf_time = Taf.query.filter_by(station_id=station_id).order_by(Taf.id.desc()).first()
-    if taf_time is not None:
-        station_taf = Taf.query.filter_by(station_id=station_id, issue_time=taf_time.issue_time).all()
-    else:
-        station_taf = None
-    pirep = Pirep.query.from_statement(db.text(f"select * from pirep where  earth_distance(ll_to_earth(pirep.latitude, pirep.longitude), ll_to_earth({station_metar.latitude}, {station_metar.longitude})) < 160934.0 AND pirep.observation_time >= (NOW() - INTERVAL '12 hours' ) ORDER BY observation_time DESC;")).all()
-    return render_template('station.html', title=f"{station_id} Weather", metar=station_metar, tafs=station_taf, station=station_id, taf_time=taf_time, pireps=pirep)
+    restaurant = Reviews.query.filter_by(restaurant_name=restaurant_name).limit(1).first_or_404()
+    return render_template('restaurant.html', title=f"{restaurant_name} Breakfast Burrito", restaurant=restaurant)
 
 @app.route('/admin/new', methods=['GET', 'POST'])
 def admin_new():
