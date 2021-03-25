@@ -1,0 +1,106 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <style>
+    #map{ height: 100% }
+  </style>
+</head>
+<body>
+ 
+  <div id="map"></div>
+ 
+  <script>
+var ash = L.layerGroup();
+    {% for ash in ASH %}
+    var polygonPoints = {{ash.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(ash).bindPopup("Hazard: {{ash.hazard}}{% if ash.severity != 'NONE' %}<br>Severity: {{ash.severity}}{% endif %}<br>Min Altitude: {{ash.min_ft_msl}}<br>Max Altitude: {{ash.max_ft_msl}}").openPopup();
+    {% endfor %}
+
+var convective = L.layerGroup();
+    {% for convective in CONVECTIVE %}
+    var polygonPoints = {{convective.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(convective).bindPopup("Hazard: {{convective.hazard}}{% if convective.severity != 'NONE' %}<br>Severity: {{convective.severity}}{% endif %}<br>Min Altitude: {{convective.min_ft_msl}}<br>Max Altitude: {{convective.max_ft_msl}}").openPopup();
+    {% endfor %}
+
+var ice = L.layerGroup();
+    {% for ice in ICE %}
+    var polygonPoints = {{ice.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(ice).bindPopup("Hazard: {{ice.hazard}}{% if ice.severity != 'NONE' %}<br>Severity: {{ice.severity}}{% endif %}<br>Min Altitude: {{ice.min_ft_msl}}<br>Max Altitude: {{ice.max_ft_msl}}").openPopup();
+    {% endfor %}
+ 
+var turb = L.layerGroup();
+    {% for turb in TURB %}
+    var polygonPoints = {{turb.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(turb).bindPopup("Hazard: {{turb.hazard}}{% if turb.severity != 'NONE' %}<br>Severity: {{turb.severity}}{% endif %}<br>Min Altitude: {{turb.min_ft_msl}}<br>Max Altitude: {{turb.max_ft_msl}}").openPopup();
+    {% endfor %}
+
+var ifr = L.layerGroup();
+    {% for ifr in IFR %}
+    var polygonPoints = {{ifr.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(ifr).bindPopup("Hazard: {{ifr.hazard}}{% if ifr.severity != 'NONE' %}<br>Severity: {{ifr.severity}}{% endif %}<br>Min Altitude: {{ifr.min_ft_msl}}<br>Max Altitude: {{ifr.max_ft_msl}}").openPopup();
+    {% endfor %}
+
+var mtn = L.layerGroup();
+    {% for mtn in MTN_OBSCN %}
+    var polygonPoints = {{mtn.lonlat}};
+        var poly = L.polygon(polygonPoints).addTo(mtn).bindPopup("Hazard: {{mtn.hazard}}{% if mtn.severity != 'NONE' %}<br>Severity: {{mtn.severity}}{% endif %}<br>Min Altitude: {{mtn.min_ft_msl}}<br>Max Altitude: {{mtn.max_ft_msl}}").openPopup();
+    {% endfor %}
+
+
+var airplaneIcon = L.icon({
+    iconUrl: "{{url_for('static', filename='photos/airplane.png')}}",
+    iconSize: [40, 40]
+})
+    
+var pirep = L.layerGroup();
+    {% for pirep in pireps %}
+        L.marker([{{pirep.latitude}}, {{pirep.longitude}}], {icon: airplaneIcon}).addTo(pirep).bindPopup("Aircraft: {{pirep.aircraft_ref}} <br>Alititude: {{pirep.altitude_ft_msl}}").openPopup();
+    {% endfor %}
+
+
+var airportIcon = L.icon({
+    iconUrl: "{{url_for('static', filename='photos/airport.png')}}",
+    iconSize: [40, 40]
+})
+
+var airport = L.layerGroup();
+    {% for airport in latlong %}
+        L.marker([{{airport.latitude}}, {{airport.longitude}}], {icon: airportIcon}).addTo(airport).bindPopup("{{airport.station_id}}").openPopup();
+    {% endfor %}
+
+var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXBmcmFuY2lzIiwiYSI6ImNrbGRzYzZucjA3bXgyb3FwNXd6NmpiYmUifQ.MHSJmJZjbsuZs9oduT7jJg';
+
+var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mbAttr}),
+    streets  = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
+
+var map = L.map('map', {
+    center: [{{latitude}}, {{longitude}}],
+    zoom: 6,
+    layers: [grayscale, mtn]
+});
+
+var baseLayers = {
+    "Grayscale": grayscale,
+    "Streets": streets
+};
+
+var overlays = {
+    "Mountains": mtn,
+    "Turbulence": turb,
+    "IFR": ifr,
+    "Ice": ice,
+    "Ash": ash,
+    "Convective": convective,
+    "PIREP": pirep,
+    "Airports": airport
+};
+
+L.control.layers(baseLayers, overlays).addTo(map);
+  
+</script>
+</body>
+</html>
