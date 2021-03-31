@@ -40,3 +40,12 @@ hr.breaker {
     content: "\2796"; /* Unicode character for "minus" sign (-) */
   }
 
+  p {
+    color: black;
+    margin-left: 10%;
+    margin-right: 10%;
+    background-color: rgb(255, 255, 255);
+  }
+h2 {
+  text-align: center;
+}
