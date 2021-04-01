@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block navbar %}
+    <div class="header-img"></div>
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
@@ -53,4 +54,20 @@
         {# application content needs to be provided in the app_content block #}
         {% block app_content %}{% endblock %}
     </div>
+    <footer>
+        <br>
+        <p class="text-center small"> Burritista | 2021</p>
+     </footer>
+    <script>
+        var prevScrollpos = window.pageYOffset;
+        window.onscroll = function() {
+        var currentScrollPos = window.pageYOffset;
+          if (prevScrollpos > currentScrollPos) {
+            document.getElementById("navbar").style.top = "0";
+          } else {
+            document.getElementById("navbar").style.top = "-50px";
+          }
+          prevScrollpos = currentScrollPos;
+        }
+        </script>
 {% endblock %}
