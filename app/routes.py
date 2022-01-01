@@ -35,6 +35,11 @@ def index():
     return render_template('index.html', title='Denver Breakfast Burrito Ratings')
 
 
+@app.route('/how_we_rate', methods=['GET', 'POST'])
+def how_we_rate():
+    return render_template('how_we_rate.html', title='Burritista - How We Rate')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:

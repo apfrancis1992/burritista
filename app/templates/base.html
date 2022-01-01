@@ -21,6 +21,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('how_we_rate') }}">How We Rate</a></li>
                     <li><a href="{{ url_for('reviews') }}">Reviews</a></li>
                     {% if not current_user.is_anonymous %}
                     {% endif %}
