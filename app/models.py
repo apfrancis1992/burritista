@@ -69,3 +69,7 @@ class Access(db.Model):
     ip = db.Column(INET)
     path = db.Column(db.String(100))
     time = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Dict_Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
