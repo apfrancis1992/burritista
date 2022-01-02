@@ -37,7 +37,12 @@ def index():
 
 @app.route('/how_we_rate', methods=['GET', 'POST'])
 def how_we_rate():
-    return render_template('how_we_rate.html', title='Burritista - How We Rate')
+    return render_template('how_we_rate.html', title='Denver Breakfast Burrito Ratings')
+
+
+@app.route('/burrito_banter', methods=['GET', 'POST'])
+def burrito_banter():
+    return render_template('burrito_banter.html', title='Denver Breakfast Burrito Ratings')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -103,7 +108,7 @@ def edit_profile():
 
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
-    restaurants = Reviews.query.order_by(Reviews.restaurant_name.asc()).all()
+    restaurants = Reviews.query.order_by(Reviews.overall_score.desc()).all()
     return render_template('reviews.html', title="Denver Breakfast Burrito Reviews", restaurants=restaurants)
 
 @app.route('/reviews/<restaurant_name>', methods=['GET', 'POST'])
