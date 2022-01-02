@@ -56,10 +56,14 @@ h3 {
 
 h2 {
   text-align: center;
+  text-decoration: underline;
+  text-decoration-color: orange;  
 }
 
 h1 {
   text-align: center;
+  text-decoration: underline;
+  text-decoration-color: orange;  
 }
 
 .header-img {

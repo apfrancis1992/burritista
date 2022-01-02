@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Posts</h1>
+    <table id="data" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Score</th>
+            <th>Published?</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for review in reviews %}
+            <tr>
+                <td>{{ review.restaurant_name }}</td>
+                <td>{{ review.overall_score }}</td>
+                <td>{{ review.published }}</td>
+                <td><a href="{{ url_for('admin_edit_post', id = review.id) }}">Edit</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+{% endblock %}

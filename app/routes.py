@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, send_from_
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, ContactForm, EditForm
 from app.models import Users, Reviews, Access
 from datetime import datetime
 from sqlalchemy import desc
@@ -87,7 +87,6 @@ def register():
 @login_required
 def user(username):
     user = Users.query.filter_by(username=username).first_or_404()
-    
     return render_template('user.html', user=user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -108,7 +107,7 @@ def edit_profile():
 
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
-    restaurants = Reviews.query.order_by(Reviews.overall_score.desc()).all()
+    restaurants = Reviews.query.order_by(Reviews.overall_score.desc()).filter_by(published='Yes')
     return render_template('reviews.html', title="Denver Breakfast Burrito Reviews", restaurants=restaurants)
 
 @app.route('/reviews/<restaurant_name>', methods=['GET', 'POST'])
@@ -130,36 +129,82 @@ def admin_new():
         overall_score = form.tortilla_score.data * 2.0 + form.potato_score.data * 2 + form.texture_score.data * 2 + form.flavor_score.data * 2 + form.general_score.data * 2
         overall_score = int(overall_score)
         burrito = Reviews(overview=form.overview.data, user_id=current_user.id, overall_score=overall_score, lat=latitude, lng=longitude, date=form.date.data, restaurant_name=form.restaurant_name.data, address=form.address.data, city=form.city.data, state=form.state.data, zip_code=form.zip_code.data, tortilla_desc=form.tortilla_desc.data, tortilla_score=form.tortilla_score.data, potato_desc=form.potato_desc.data, potato_score=form.potato_score.data, texture_desc=form.texture_desc.data, texture_score=form.texture_score.data, flavor_desc=form.flavor_desc.data, flavor_score=form.flavor_score.data, general_desc=form.general_desc.data, general_score=form.general_score.data, smother=form.smother.data, smother_score=form.smother_score.data, published=form.published.data)
-        db.session.add(burrito)
         db.session.commit()
         flash(f'Your post is now live!')
         return redirect(url_for('index'))
     return render_template('new_burrito.html', title='New Burrito', form=form)
 
+@app.route('/admin/edit', methods=['GET', 'POST'])
+def admin_edit():
+    reviews = Reviews.query.order_by(Reviews.restaurant_name.asc()).all()
+    return render_template('reviews_admin.html', title='Admin Reviews',
+                           reviews=reviews)
+
+@app.route('/admin/edit/<id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit_post(id):
+    review = Reviews.query.filter_by(id=id).first_or_404()
+    form = EditForm()
+    if form.validate_on_submit():
+        g_address = form.address.data.replace(" ", "+")
+        g_city = form.city.data.replace(" ", "+")
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={g_address},+{g_city},+{form.state.data}&key={os.environ.get('API')}"
+        r = requests.get(url)
+        j = json.loads(r.text)
+        latitude = j['results'][0]['geometry']['location']['lat']
+        longitude = j['results'][0]['geometry']['location']['lng']
+        overall_score = form.tortilla_score.data * 2.0 + form.potato_score.data * 2 + form.texture_score.data * 2 + form.flavor_score.data * 2 + form.general_score.data * 2
+        overall_score = int(overall_score)
+        review.overview=form.overview.data
+        review.user_id=current_user.id
+        review.overall_score=overall_score
+        review.lat=latitude
+        review.lng=longitude
+        review.date=form.date.data
+        review.restaurant_name=form.restaurant_name.data
+        review.address=form.address.data
+        review.city=form.city.data
+        review.state=form.state.data
+        review.zip_code=form.zip_code.data
+        review.tortilla_desc=form.tortilla_desc.data
+        review.tortilla_score=form.tortilla_score.data
+        review.potato_desc=form.potato_desc.data
+        review.potato_score=form.potato_score.data
+        review.texture_desc=form.texture_desc.data
+        review.texture_score=form.texture_score.data
+        review.flavor_desc=form.flavor_desc.data
+        review.flavor_score=form.flavor_score.data
+        review.general_desc=form.general_desc.data
+        review.general_score=form.general_score.data
+        review.smother=form.smother.data
+        review.smother_score=form.smother_score.data
+        review.published=form.published.data
+        db.session.commit()
+        return redirect(url_for('admin_edit'))
+    elif request.method == 'GET':
+        form.overview.data=review.overview
+        form.date.data=review.date
+        form.restaurant_name.data=review.restaurant_name
+        form.address.data=review.address
+        form.city.data=review.city
+        form.state.data=review.state
+        form.zip_code.data=review.zip_code
+        form.tortilla_desc.data=review.tortilla_desc
+        form.tortilla_score.data=review.tortilla_score
+        form.potato_desc.data=review.potato_desc
+        form.potato_score.data=review.potato_score
+        form.texture_desc.data=review.texture_desc
+        form.texture_score.data=review.texture_score
+        form.flavor_desc.data=review.flavor_desc
+        form.flavor_score.data=review.flavor_score
+        form.general_desc.data=review.general_desc
+        form.general_score.data=review.general_score
+        form.smother.data=review.smother
+        form.smother_score.data=review.smother_score
+        form.published.data=review.published
+    return render_template('admin_edit_post.html', title='Edit Burrito', form=form)
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                           'favicon.ico',mimetype='image/vnd.microsoft.icon')
-
-
-@app.route('/map', methods=['GET', 'POST'])
-@login_required
-def map():
-    latlong = Station.query.from_statement(db.text("SELECT *  FROM station WHERE country = 'US' AND taf = TRUE;")).all()
-    MTN_OBSCN = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'MTN OBSCN';"))
-    IFR = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'IFR';"))
-    TURB = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'TURB';"))
-    ICE = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'ICE';"))
-    pireps = Pirep.query.from_statement(db.text("SELECT * FROM pirep WHERE observation_time >= NOW() - INTERVAL '1 HOUR';")).all()
-    CONVECTIVE = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'CONVECTIVE';"))
-    ASH = Airsigmet.query.from_statement(db.text("SELECT * FROM airsigmet WHERE valid_time_to >= NOW() AND hazard = 'ASH';"))
-    try:
-        url = f"http://api.ipstack.com/{request.headers['X-Real-IP']}?access_key={os.environ.get('IPSTACK')}"
-        r = requests.get(url)
-        j = json.loads(r.text)
-        latitude = j['latitude']
-        longitude = j['longitude']
-    except:
-        latitude = 44.967243
-        longitude = -103.771556
-    return render_template('map.html', title='Follow', latlong=latlong, MTN_OBSCN=MTN_OBSCN, pireps=pireps, IFR=IFR, TURB=TURB, ICE=ICE, CONVECTIVE=CONVECTIVE, ASH=ASH, latitude=latitude, longitude=longitude)

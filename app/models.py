@@ -5,6 +5,7 @@ from datetime import datetime
 from hashlib import md5
 from sqlalchemy.dialects.postgresql import ARRAY, INET
 
+
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -58,10 +59,12 @@ class Reviews(db.Model):
     general_desc = db.Column(db.String(1000))
     general_score = db.Column(db.Integer)
     overall_score = db.Column(db.Integer, index=True)
-    smother = db.Column(db.Boolean)
-    smother_score = db.Column(db.Boolean)
+    smother = db.Column(db.String(3))
+    smother_score = db.Column(db.String(3))
     overview = db.Column(db.String(1000))
-    published = db.Column(db.Boolean)
+    published = db.Column(db.String(3))
+
+
 
 class Access(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,3 +76,9 @@ class Access(db.Model):
 class Dict_Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
+
+class DictYN(db.Model):
+    type = db.Column(db.String(3), primary_key=True)
+
+class DictScore(db.Model):
+    type = db.Column(db.String(1), primary_key=True)
