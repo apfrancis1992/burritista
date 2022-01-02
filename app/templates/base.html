@@ -35,7 +35,9 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="{{ url_for('admin_new') }}">New Review</a></li>
-                            <li><a href="{{ url_for('admin_edit') }}">Edit Post</a></li>
+                            <li><a href="{{ url_for('admin_edit') }}">Edit Review</a></li>
+                            <li><a href="{{ url_for('admin_banter_add') }}">Add Banter</a></li>
+                            <li><a href="{{ url_for('admin_banter') }}">Edit Banter</a></li>
                         </ul>
                       </li>
                     <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>

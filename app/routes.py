@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, url_for, request, send_from_
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, ContactForm, EditForm
-from app.models import Users, Reviews, Access
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, ContactForm, EditForm, BanterForm
+from app.models import Users, Reviews, Access, BurritoBanter
 from datetime import datetime
 from sqlalchemy import desc
 from functools import wraps
@@ -54,7 +54,8 @@ def how_we_rate():
 
 @app.route('/burrito_banter', methods=['GET', 'POST'])
 def burrito_banter():
-    return render_template('burrito_banter.html', title='Denver Breakfast Burrito Ratings')
+    banters = BurritoBanter.query.order_by(BurritoBanter.date.desc())
+    return render_template('burrito_banter.html', title="Denver Breakfast Burrito Reviews", banters=banters)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -127,7 +128,7 @@ def restaurant(restaurant_name):
     restaurant = Reviews.query.filter_by(restaurant_name=restaurant_name).limit(1).first_or_404()
     return render_template('restaurant.html', title=f"{restaurant_name} Breakfast Burrito", restaurant=restaurant)
 
-@app.route('/admin/new', methods=['GET', 'POST'])
+@app.route('/admin/review/new', methods=['GET', 'POST'])
 @admin_required
 def admin_new():
     form = NewForm()
@@ -155,7 +156,7 @@ def admin_edit():
     return render_template('reviews_admin.html', title='Admin Reviews',
                            reviews=reviews)
 
-@app.route('/admin/edit/<id>', methods=['GET', 'POST'])
+@app.route('/admin/review/edit/<id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def admin_edit_post(id):
@@ -219,6 +220,44 @@ def admin_edit_post(id):
         form.smother_score.data=review.smother_score
         form.published.data=review.published
     return render_template('admin_edit_post.html', title='Edit Burrito', form=form)
+
+@app.route('/admin/banter', methods=['GET', 'POST'])
+@admin_required
+def admin_banter():
+    banters = BurritoBanter.query.order_by(BurritoBanter.date.asc()).all()
+    return render_template('banter_admin.html', title='Admin Burrito Banter',
+                           banters=banters)
+
+@app.route('/admin/banter/new', methods=['GET', 'POST'])
+@admin_required
+def admin_banter_add():
+    form = BanterForm()
+    if form.validate_on_submit():
+        banter = BurritoBanter(date=form.date.data, location=form.location.data, banter=form.banter.data)
+        db.session.add(banter)
+        db.session.commit()
+        flash(f'Your post is now live!')
+        return redirect(url_for('index'))
+    return render_template('banter_form.html', title='New Banter', form=form)
+
+
+@app.route('/admin/banter/edit/<id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_banter_edit(id):
+    banter = BurritoBanter.query.filter_by(id=id).first_or_404()
+    form = BanterForm()
+    if form.validate_on_submit():
+        banter.date=form.date.data
+        banter.location=form.location.data
+        banter.banter=form.banter.data
+        db.session.commit()
+        return redirect(url_for('admin_banter'))
+    elif request.method == 'GET':
+        form.date.data=banter.date
+        form.location.data=banter.location
+        form.banter.data=banter.banter
+    return render_template('banter_form.html', title='Edit Banter', form=form)
 
 @app.route('/favicon.ico')
 def favicon():

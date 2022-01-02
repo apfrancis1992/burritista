@@ -120,3 +120,9 @@ class EditForm(FlaskForm):
         self.published.choices = [(e.type, e.type) for e in DictYN.query.all()]
         self.smother.choices = [(e.type, e.type) for e in DictYN.query.all()]
         self.smother_score.choices = [(e.type, e.type) for e in DictScore.query.all()]
+
+class BanterForm(FlaskForm):
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+    location = StringField('Location', validators=[DataRequired()])
+    banter = TextAreaField('Banter', validators=[DataRequired()])
+    submit = SubmitField('Submit')

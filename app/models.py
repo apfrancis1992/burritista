@@ -82,3 +82,9 @@ class DictYN(db.Model):
 
 class DictScore(db.Model):
     type = db.Column(db.String(1), primary_key=True)
+
+class BurritoBanter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    location = db.Column(db.String(500), index=True)
+    banter = db.Column(db.String(1000))
