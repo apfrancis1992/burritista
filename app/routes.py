@@ -129,6 +129,7 @@ def admin_new():
         overall_score = form.tortilla_score.data * 2.0 + form.potato_score.data * 2 + form.texture_score.data * 2 + form.flavor_score.data * 2 + form.general_score.data * 2
         overall_score = int(overall_score)
         burrito = Reviews(overview=form.overview.data, user_id=current_user.id, overall_score=overall_score, lat=latitude, lng=longitude, date=form.date.data, restaurant_name=form.restaurant_name.data, address=form.address.data, city=form.city.data, state=form.state.data, zip_code=form.zip_code.data, tortilla_desc=form.tortilla_desc.data, tortilla_score=form.tortilla_score.data, potato_desc=form.potato_desc.data, potato_score=form.potato_score.data, texture_desc=form.texture_desc.data, texture_score=form.texture_score.data, flavor_desc=form.flavor_desc.data, flavor_score=form.flavor_score.data, general_desc=form.general_desc.data, general_score=form.general_score.data, smother=form.smother.data, smother_score=form.smother_score.data, published=form.published.data)
+        db.session.add(burrito)
         db.session.commit()
         flash(f'Your post is now live!')
         return redirect(url_for('index'))
