@@ -6,11 +6,23 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, Con
 from app.models import Users, Reviews, Access
 from datetime import datetime
 from sqlalchemy import desc
+from functools import wraps
 import json
 from dotenv import load_dotenv
 import requests
 import os
 
+
+def admin_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if current_user.is_anonymous:  
+            return redirect('https://www.youtube.com/watch/dQw4w9WgXcQ')
+        elif current_user.access == 1:
+            return f(*args, **kwargs)
+        else:
+            return redirect('https://www.youtube.com/watch/dQw4w9WgXcQ')
+    return wrap
 
 @app.before_request
 def before_request():
@@ -116,6 +128,7 @@ def restaurant(restaurant_name):
     return render_template('restaurant.html', title=f"{restaurant_name} Breakfast Burrito", restaurant=restaurant)
 
 @app.route('/admin/new', methods=['GET', 'POST'])
+@admin_required
 def admin_new():
     form = NewForm()
     if form.validate_on_submit():
@@ -136,6 +149,7 @@ def admin_new():
     return render_template('new_burrito.html', title='New Burrito', form=form)
 
 @app.route('/admin/edit', methods=['GET', 'POST'])
+@admin_required
 def admin_edit():
     reviews = Reviews.query.order_by(Reviews.restaurant_name.asc()).all()
     return render_template('reviews_admin.html', title='Admin Reviews',
@@ -143,6 +157,7 @@ def admin_edit():
 
 @app.route('/admin/edit/<id>', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def admin_edit_post(id):
     review = Reviews.query.filter_by(id=id).first_or_404()
     form = EditForm()
