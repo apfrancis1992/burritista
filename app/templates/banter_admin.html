@@ -15,7 +15,7 @@
         <tbody>
           {% for banter in banters %}
             <tr>
-                <td>{{ banter.date }}</td>
+                <td>{{ banter.date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ banter.location }}</td>
                 <td>{{ banter.banter }}</td>
                 <td><a href="{{ url_for('admin_banter_edit', id = banter.id) }}">Edit</a></td>

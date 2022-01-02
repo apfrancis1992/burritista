@@ -4,7 +4,7 @@
 {% block app_content %}
     <h1>Burrito Banter</h1>
           {% for banter in banters %}
-          <p>{{ banter.date }} - {{ banter.location }}: {{ banter.banter }}</p><br>
+          <p>{{ banter.date.strftime('%Y-%m-%d') }} - <b>{{ banter.location }}</b>: {{ banter.banter }}</p><br>
           {% endfor %}
     <br>
     <br>
