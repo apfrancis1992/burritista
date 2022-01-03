@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, url_for, request, send_from_
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, ContactForm, EditForm, BanterForm
-from app.models import Users, Reviews, Access, BurritoBanter
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewForm, ContactForm, EditForm, BanterForm, ContactForm
+from app.models import Users, Reviews, Access, BurritoBanter, Messages
 from datetime import datetime
 from sqlalchemy import desc
 from functools import wraps
@@ -18,7 +18,7 @@ def admin_required(f):
     def wrap(*args, **kwargs):
         if current_user.is_anonymous:  
             return redirect('https://www.youtube.com/watch/dQw4w9WgXcQ')
-        elif current_user.access == 1:
+        elif current_user.access == 3:
             return f(*args, **kwargs)
         else:
             return redirect('https://www.youtube.com/watch/dQw4w9WgXcQ')
@@ -110,11 +110,17 @@ def edit_profile():
         current_user.username = form.username.data
         current_user.phone = form.phone.data
         current_user.email = form.email.data
+        current_user.alerts = form.alerts.data
+        current_user.newsletter = form.alerts.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
+        form.phone.data = current_user.phone
+        form.email.data = current_user.email
+        form.alerts.data = current_user.alerts
+        form.newsletter.data = current_user.newsletter
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
@@ -263,3 +269,14 @@ def admin_banter_edit(id):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                           'favicon.ico',mimetype='image/vnd.microsoft.icon')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    form = ContactForm()
+    if form.validate_on_submit():
+        message = Messages(name=form.name.data, email=form.email.data, subject=form.subject.data, message=form.message.data)
+        db.session.add(message)
+        db.session.commit()
+        flash('Thank you for contacting us!')
+        return redirect(url_for('index'))
+    return render_template('contact.html', title='Denver Breakfast Burrito Reviews', form=form)

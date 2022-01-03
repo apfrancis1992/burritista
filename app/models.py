@@ -14,8 +14,8 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     phone = db.Column(db.String(12), index=True, unique=True)
     access = db.Column(db.Integer, default=1)
-    alerts = db.Column(db.Boolean)
-    newsletter = db.Column(db.Boolean)
+    alerts = db.Column(db.String(3))
+    newsletter = db.Column(db.String(3))
     password_hash = db.Column(db.String(128))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -88,3 +88,10 @@ class BurritoBanter(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
     location = db.Column(db.String(500), index=True)
     banter = db.Column(db.String(1000))
+
+class Messages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    email = db.Column(db.String(50))
+    subject = db.Column(db.String(50))
+    message = db.Column(db.String(1000))

@@ -44,11 +44,17 @@ class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Phone', validators=[DataRequired()])
+    newsletter = SelectField('Newsletter?')
+    alerts = SelectField('Burrito Alerts?')
     submit = SubmitField('Submit')
+
+
 
     def __init__(self, original_username, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
+        self.newsletter.choices = [(e.type, e.type) for e in DictYN.query.all()]
+        self.alerts.choices = [(e.type, e.type) for e in DictYN.query.all()]
 
     def validate_username(self, username):
         if username.data != self.original_username:
@@ -87,10 +93,11 @@ class NewForm(FlaskForm):
 
 
 class ContactForm(FlaskForm):
-    name = StringField('First Name', validators=[DataRequired()])
-    email = email = StringField('Email', validators=[DataRequired(), Email()])
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     subject = StringField('Subject', validators=[DataRequired()])
     message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 class EditForm(FlaskForm):
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
