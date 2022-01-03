@@ -74,7 +74,7 @@ h1 {
 }
 
 footer { 
-  position: fixed; 
+  position: static; 
   width: 100%; 
   background: rgb(206, 206, 206); 
   bottom: 0; 
