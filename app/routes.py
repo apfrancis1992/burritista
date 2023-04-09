@@ -12,6 +12,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import requests
 import os
+import plotly.graph_objs as go
 
 
 def admin_required(f):
@@ -128,7 +129,22 @@ def edit_profile():
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
     restaurants = Reviews.query.order_by(Reviews.overall_score.desc()).filter_by(published='Yes')
-    return render_template('reviews.html', title="Denver Breakfast Burrito Reviews", restaurants=restaurants)
+
+    # Create a bar chart of the overall scores
+    x = [r.restaurant_name for r in restaurants]
+    y = [r.overall_score for r in restaurants]
+    data = [go.Bar(x=x, y=y)]
+
+    # Create layout for the chart
+    layout = go.Layout(title='Denver Breakfast Burrito Reviews',
+                       xaxis=dict(title='Restaurant'),
+                       yaxis=dict(title='Overall Score'))
+
+    # Render the chart
+    chart = go.Figure(data=data, layout=layout)
+    chart_div = chart.to_html(full_html=False)
+
+    return render_template('reviews.html', title="Denver Breakfast Burrito Reviews", restaurants=restaurants, chart_div=chart_div)
 
 @app.route('/reviews/<restaurant_name>', methods=['GET', 'POST'])
 def restaurant(restaurant_name):
