@@ -301,3 +301,7 @@ def contact():
 @app.route('/about_us', methods=['GET', 'POST'])
 def about_us():
     return render_template('about_us.html', title='About Burritista')
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html', title="404 Burrito Not Found"), 404
