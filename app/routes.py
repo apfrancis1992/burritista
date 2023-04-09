@@ -8,6 +8,7 @@ from datetime import datetime
 from sqlalchemy import desc
 from functools import wraps
 import json
+import pandas as pd
 from dotenv import load_dotenv
 import requests
 import os

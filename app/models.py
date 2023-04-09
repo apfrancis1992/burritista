@@ -81,7 +81,7 @@ class DictYN(db.Model):
     type = db.Column(db.String(3), primary_key=True)
 
 class DictScore(db.Model):
-    type = db.Column(db.String(1), primary_key=True)
+    type = db.Column(db.String(3), primary_key=True)
 
 class BurritoBanter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
