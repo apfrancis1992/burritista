@@ -297,3 +297,7 @@ def contact():
         flash('Thank you for contacting us!')
         return redirect(url_for('index'))
     return render_template('contact.html', title='Denver Breakfast Burrito Reviews', form=form)
+
+@app.route('/about_us', methods=['GET', 'POST'])
+def about_us():
+    return render_template('about_us.html', title='About Burritista')
